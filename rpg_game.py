@@ -12,6 +12,7 @@ class PanelSetting:
         self.ground_img = tk.PhotoImage(file="ground.png")
         self.wall_img = tk.PhotoImage(file="wall.png")
         self.player_img = tk.PhotoImage(file="player.png")
+        self.blue_img = tk.PhotoImage(file="blue.png")
 
 class PlayerSetting:
     def __init__(self):
@@ -19,8 +20,8 @@ class PlayerSetting:
         self.move_mode = False
 
         #フィールド描画開始位置
-        self.field_x = 0
-        self.field_y = 0
+        self.field_x = -7
+        self.field_y = -5
 
          #画面中央のプレイヤー座標
         self.center_x = 8
@@ -57,14 +58,14 @@ def handle_key(event, mypanel, mymap, player, canvas):
     #人物が動かない場合
     if player.move_mode == False:
     #falseで当たり判定検出なし、trueで障害物発見
-        can_move = collision(place_x+ player.field_x+player.center_x, place_y+player.field_y+player.center_y, mypanel, mymap)
-        if can_move == False:
+        collision_if = collision(place_x+ player.field_x+player.center_x, place_y+player.field_y+player.center_y, mypanel, mymap)
+        if collision_if == False:
             player.field_x += place_x 
             player.field_y += place_y
     #人物が動く場合
     else:
-        can_move = collision(place_x+ player.player_x, place_y+player.player_y, mypanel, mymap)
-        if can_move == False:
+        collision_if = collision(place_x+ player.player_x, place_y+player.player_y, mypanel, mymap)
+        if collision_if == False:
             player.player_x += place_x 
             player.player_y += place_y
     #print(player.field_x)a
@@ -104,6 +105,7 @@ def displayMap(mypanel, mymap, player, canvas):
     ground_img = mypanel.ground_img
     wall_img = mypanel.wall_img
     player_img = mypanel.player_img
+    blue_img = mypanel.blue_img
     
     # キャンバスにイメージを表示
     #写真の中央が設置座標だということに注意
@@ -115,11 +117,15 @@ def displayMap(mypanel, mymap, player, canvas):
                     canvas.create_image(32*j+16, 32*i+16, image=ground_img)
                 elif mymap.map_1[i][j] == 1:
                     canvas.create_image(32*j+16, 32*i+16, image=wall_img)
+                elif mymap.map_1[i][j] == 2:
+                    canvas.create_image(32*j+16, 32*i+16, image=blue_img)
             else:
                 if mymap.map_1[i][j] == 0:
                     canvas.create_image(32*j-(32*player.field_x)+16, 32*i-(32*player.field_y)+16, image=ground_img)
                 elif mymap.map_1[i][j] == 1:
                     canvas.create_image(32*j-(32*player.field_x)+16, 32*i-(32*player.field_y)+16, image=wall_img)
+                elif mymap.map_1[i][j] == 2:
+                    canvas.create_image(32*j-(32*player.field_x)+16, 32*i-(32*player.field_y)+16, image=blue_img)
     
     # プレイヤーを表示
     canvas.create_image(32*player.player_x+16, 32*player.player_y+16, image=player_img)
