@@ -1,5 +1,6 @@
 import tkinter as tk
 import rpg_map
+import time
 
 class PanelSetting:
     def __init__(self):
@@ -35,8 +36,47 @@ class PlayerSetting:
 def collision(x, y,mypanel,mymap):
     if(mymap.map_1[y][x] == 1):
         return True
+    elif(mymap.map_1[y][x] == 2):
+        print("ゴールしました")
+        return False
     else:
         return False
+
+def treasure_search(mypanel, mymap, player, canvas):
+    print('treasure_search')
+
+
+    for i in range(10):
+        place_x = 0
+        place_y = 0
+        
+        if(i%2==0):
+            place_y += 1
+        else:
+            place_x += 1
+        
+         #人物が動かない場合
+        if player.move_mode == False:
+        #falseで当たり判定検出なし、trueで障害物発見
+            collision_if = collision(place_x+ player.field_x+player.center_x, place_y+player.field_y+player.center_y, mypanel, mymap)
+            if collision_if == False:
+                player.field_x += place_x 
+                player.field_y += place_y
+        #人物が動く場合
+        else:
+            collision_if = collision(place_x+ player.player_x, place_y+player.player_y, mypanel, mymap)
+            if collision_if == False:
+                player.player_x += place_x 
+                player.player_y += place_y
+
+        #プレイヤー位置が変更されたので再描画
+        canvas.delete("all")
+        displayMap(mypanel, mymap, player, canvas)
+        time.sleep(1)
+        
+        
+
+
 
 def handle_key(event, mypanel, mymap, player, canvas):
     place_x = 0
@@ -50,6 +90,8 @@ def handle_key(event, mypanel, mymap, player, canvas):
         place_y += 1     
     elif event.keysym == 'd':
         place_x += 1
+    elif event.keysym == 'h':
+        treasure_search(mypanel, mymap, player, canvas)
 
     #falseで当たり判定検出なし、trueで障害物発見
     #can_move = collision(place_x+ player.field_x+player.center_x, place_y+player.field_y+player.center_y, mypanel, mymap)
@@ -70,10 +112,8 @@ def handle_key(event, mypanel, mymap, player, canvas):
             player.player_y += place_y
     #print(player.field_x)a
 
-    
-        
     #プレイヤー位置が変更されたので再描画
-    canvas.delete("all")
+    
     displayMap(mypanel, mymap, player, canvas)
 
 def main():
@@ -102,6 +142,9 @@ def main():
 
 
 def displayMap(mypanel, mymap, player, canvas):
+    #以前のキャンバスをすべて消す
+    canvas.delete("all")
+
     ground_img = mypanel.ground_img
     wall_img = mypanel.wall_img
     player_img = mypanel.player_img
@@ -129,7 +172,8 @@ def displayMap(mypanel, mymap, player, canvas):
     
     # プレイヤーを表示
     canvas.create_image(32*player.player_x+16, 32*player.player_y+16, image=player_img)
-
+    #キャンバスを再描画
+    canvas.update()
 
 if __name__ == "__main__":
     main()
